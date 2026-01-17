@@ -6,7 +6,7 @@ const PORT = 5000;
 app.use(express.json());
 
 app.get("/", (req: Request, res: Response) => {
-    res.json({ message: "Hello from Express + TypeScript!" });
+    res.json({ message: "Hello from Express + TS!" });
 });
 
 app.listen(PORT, () => {

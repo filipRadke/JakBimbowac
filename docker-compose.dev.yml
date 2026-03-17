@@ -2,14 +2,31 @@ services:
   neo4j:
     image: neo4j:5
     container_name: neo4j
+    environment:
+      NEO4J_AUTH: neo4j/password
     ports:
       - "7474:7474"
       - "7687:7687"
-    environment:
-      NEO4J_AUTH: neo4j/password
     volumes:
+      - ./neo4j/import:/import
       - neo4j_data:/data
-      - neo4j_logs:/logs
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p password 'RETURN 1;'"]
+      interval: 5s
+      retries: 20
+    entrypoint: ["/bin/bash", "/init/run_import.sh"]
+
+  mariadb:
+    image: mariadb:11
+    container_name: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: tram
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mariadb/init:/docker-entrypoint-initdb.d
+      - mariadb_data:/var/lib/mysql
 
   backend:
     build:
@@ -41,4 +58,4 @@ services:
 
 volumes:
   neo4j_data:
-  neo4j_logs:
+  mariadb_data:

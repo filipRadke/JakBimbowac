@@ -1,31 +1,35 @@
 services:
   neo4j:
-    image: neo4j:5
+    build: ./neo4j
     container_name: neo4j
     environment:
       NEO4J_AUTH: neo4j/password
+      NEO4J_server_directories_import: /import
     ports:
       - "7474:7474"
       - "7687:7687"
     volumes:
-      - ./neo4j/import:/import
       - neo4j_data:/data
-    healthcheck:
-      test: ["CMD-SHELL", "cypher-shell -u neo4j -p password 'RETURN 1;'"]
-      interval: 5s
-      retries: 20
-    entrypoint: ["/bin/bash", "/init/run_import.sh"]
+    command: >
+      sh -c "
+      neo4j console & 
+      until cypher-shell -u neo4j -p password 'RETURN 1;' >/dev/null 2>&1; do
+          sleep 5;
+      done;
+      echo 'Running import...';
+      cypher-shell -u neo4j -p password -f /import/import.cypher;
+      wait
+      "
 
   mariadb:
-    image: mariadb:11
+    build: ./mariadb
     container_name: mariadb
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: tram
+      MYSQL_DATABASE: ztm
     ports:
       - "3306:3306"
     volumes:
-      - ./mariadb/init:/docker-entrypoint-initdb.d
       - mariadb_data:/var/lib/mysql
 
   backend:

@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { getSession } from "./neo4j";
+import { prisma } from "../lib/prisma";
 
 const app = express();
 const PORT = 3000;
@@ -10,22 +10,13 @@ app.get("/", (req: Request, res: Response) => {
     res.json({ message: "This is the backend, you shouldn't be here" });
 });
 
-app.get("/create", async (req: Request, res: Response) => {
-    const db = getSession();
-    const timeNow = Date.now();
-    let out;
-    try {
-        const res = await db.run(
-            'CREATE (t:Timestamp {time: $timeNow}) RETURN t',
-            {timeNow}
-        )
-
-        out = res.records[0].get("t")
-    } finally {
-        await db.close()
+app.get("/testPrisma", async (req: Request, res: Response) => {
+    const stops = await prisma.stops.findMany()
+    async () => {
+        await prisma.$disconnect();
     }
 
-    res.json(out);
+    res.json(stops)
 });
 
 app.listen(PORT, () => {

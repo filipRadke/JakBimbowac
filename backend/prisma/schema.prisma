@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model routes {
+  route_id         String  @id @db.VarChar(50)
+  agency_id        Int?
+  route_short_name String? @db.VarChar(50)
+  route_long_name  String? @db.VarChar(255)
+  route_desc       String? @db.Text
+  route_type       Int?
+  route_color      String? @db.VarChar(10)
+  route_text_color String? @db.VarChar(10)
+}
+
+model stop_times {
+  trip_id        String    @db.VarChar(100)
+  arrival_time   DateTime? @db.Time(0)
+  departure_time DateTime? @db.Time(0)
+  stop_id        Int?
+  stop_sequence  Int
+  stop_headsign  String?   @db.VarChar(255)
+  pickup_type    Int?
+  drop_off_type  Int?
+
+  @@id([trip_id, stop_sequence])
+}
+
+model stops {
+  stop_id   Int      @id
+  stop_code String?  @db.VarChar(20)
+  stop_name String?  @db.VarChar(100)
+  stop_lat  Decimal? @db.Decimal(10, 8)
+  stop_lon  Decimal? @db.Decimal(11, 8)
+  zone_id   String?  @db.VarChar(5)
+}
+
+model trips {
+  route_id              String? @db.VarChar(50)
+  service_id            String? @db.VarChar(50)
+  trip_id               String  @id @db.VarChar(100)
+  trip_headsign         String? @db.VarChar(255)
+  direction_id          Int?
+  shape_id              Int?
+  wheelchair_accessible Int?
+  brigade               Int?
+}

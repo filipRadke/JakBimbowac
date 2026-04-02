@@ -1,29 +1,28 @@
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import map from "./assets/schemat_tram.svg";
 
 function Map() {
     return (
-        <div className="map-container" style={{ width: "100%", height: "100%" }}>
+        <div className="fixed inset-0 z-0 bg-gray-300 overflow-hidden">
             <TransformWrapper
-                initialScale={0.9}
+                initialScale={1}
                 minScale={0.5}
-                maxScale={3}
-                wheel={{ step: 0.1 }} // scroll zoom
-                doubleClick={{ disabled: true }} // optional
-                pinch={{ step: 5 }} // pinch zoom on touch devices
-                limitToBounds={true}
-                boundsPadding={0.1}// optional: allow panning outside container
+                maxScale={4}
+                centerOnInit
+                wheel={{ step: 0.05 }}
+                doubleClick={{ disabled: true }}
             >
-                {() => (
-                    <>
-                        <TransformComponent>
-                            <img
-                                src="/src/assets/schemat_tram.svg"
-                                alt="map"
-                                 style={{ width: "100%", height: "100%", userSelect: "none", pointerEvents: "none" }}
-                            />
-                        </TransformComponent>
-                    </>
-                )}
+                <TransformComponent
+                    wrapperClass="w-full h-full"
+                    contentClass="w-full h-full flex items-center justify-center"
+                >
+                    <img
+                        src={map}
+                        alt="map"
+                        className="max-w-none select-none"
+                        draggable={false}
+                    />
+                </TransformComponent>
             </TransformWrapper>
         </div>
     );

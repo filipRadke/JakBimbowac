@@ -32,7 +32,7 @@ docker compose up --build
 
 ## 🔥 Development Mode (Hot Reload)
 ```bash
-docker compose -f docker-compose.dev.yml up --build
+docker compose -f compose.dev.yml up --build
 ```
 
 ---

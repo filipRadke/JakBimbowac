@@ -5,6 +5,7 @@ services:
     environment:
       NEO4J_AUTH: neo4j/password
       NEO4J_server_directories_import: /import
+      NEO4J_dbms_memory_transaction_total_max: 1G
     ports:
       - "7474:7474"
       - "7687:7687"
@@ -12,7 +13,10 @@ services:
       - neo4j_data:/data
     command: >
       sh -c "
-      neo4j console & 
+      echo 'Import';
+      sleep 20;
+      neo4j console &
+      
       until cypher-shell -u neo4j -p password 'RETURN 1;' >/dev/null 2>&1; do
           sleep 5;
       done;

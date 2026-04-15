@@ -8,7 +8,7 @@ CREATE TABLE `routes` (
   `route_color` varchar(10) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `route_text_color` varchar(10) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`route_id`)
-)
+);
 
 CREATE TABLE `stop_times` (
       `trip_id` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE `stop_times` (
       `pickup_type` int DEFAULT NULL,
       `drop_off_type` int DEFAULT NULL,
       PRIMARY KEY (`trip_id`,`stop_sequence`)
-)
+);
 
 CREATE TABLE `stops` (
  `stop_id` int NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE `stops` (
  `stop_lon` decimal(11,8) DEFAULT NULL,
  `zone_id` varchar(5) COLLATE utf8mb4_general_ci DEFAULT NULL,
  PRIMARY KEY (`stop_id`)
-)
+);
 
 CREATE TABLE `trips` (
  `route_id` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
@@ -42,4 +42,4 @@ CREATE TABLE `trips` (
  `wheelchair_accessible` int DEFAULT NULL,
  `brigade` int DEFAULT NULL,
  PRIMARY KEY (`trip_id`)
-)
+);

@@ -19,6 +19,32 @@ app.get("/stops", async (req: Request, res: Response) => {
     res.json(stops)
 });
 
+app.get("/stopTimes/:stopId", async (req: Request, res: Response) => {
+    const routes = await prisma.$queryRaw`
+      SELECT *
+      FROM stop_times
+      WHERE stop_id = ${req.params.stopId}`;`
+      ORDER BY departure_time;
+    `;
+    async ()=> {
+        await prisma.$disconnect();
+    }
+
+    console.log(routes)
+
+    res.json(routes)
+})
+
+app.get("/trips", async (req: Request, res: Response) => {
+    const trips = await prisma.trips.findMany();
+
+    async ()=> {
+        await prisma.$disconnect();
+    }
+
+    res.json(trips)
+})
+
 app.get("/routes", async (req: Request, res: Response) => {
     const routes = await prisma.routes.findMany()
     async ()=> {
@@ -34,7 +60,7 @@ app.get("/routes/:stopId", async (req: Request, res: Response) => {
         FROM stop_times st
                  JOIN trips t ON st.trip_id = t.trip_id
                  JOIN routes r ON t.route_id = r.route_id
-        WHERE st.stop_id = ${req.params.stopId}
+        WHERE st.stop_id = ${req.params.stopId} AND t.trip_id LIKE "%+"
     `;
     async ()=> {
         await prisma.$disconnect();
@@ -44,40 +70,27 @@ app.get("/routes/:stopId", async (req: Request, res: Response) => {
 })
 
 app.get("/departures/:stopId", async (req: Request, res: Response) => {
-    const currentTime = new Date().toTimeString().slice(0, 8);
 
     const departures = await prisma.$queryRaw`
-        (
-          SELECT 
+        SELECT
             st.departure_time,
-            r.route_id,
             r.route_short_name,
             t.trip_headsign
-          FROM stop_times st
-          JOIN trips t ON st.trip_id = t.trip_id
-          JOIN routes r ON t.route_id = r.route_id
-          WHERE st.stop_id = ${req.params.stopId}
-            AND st.departure_time >= ${currentTime}
-          ORDER BY st.departure_time ASC
-          LIMIT 10
-        )
-        UNION ALL
-        (
-          SELECT 
-            st.departure_time,
-            r.route_id,
-            r.route_short_name,
-            t.trip_headsign
-          FROM stop_times st
-          JOIN trips t ON st.trip_id = t.trip_id
-          JOIN routes r ON t.route_id = r.route_id
-          WHERE st.stop_id = ${req.params.stopId}
-            AND st.departure_time < ${currentTime}
-          ORDER BY st.departure_time ASC
-          LIMIT 10
-        )
-        LIMIT 10;
-        `;
+        FROM stop_times st
+                 JOIN trips t ON st.trip_id = t.trip_id
+                 JOIN routes r ON t.route_id = r.route_id
+        WHERE st.stop_id = ${req.params.stopId}
+
+          AND CAST(SUBSTRING_INDEX(t.trip_id, '_', 1) AS UNSIGNED) = WEEKDAY(CURDATE()) + 1
+
+        ORDER BY
+            CASE
+                WHEN TIME_TO_SEC(st.departure_time) >= TIME_TO_SEC(CURTIME()) THEN 0
+                ELSE 1
+                END,
+            st.departure_time
+            LIMIT 10;
+    `;
 
     async ()=> {
         await prisma.$disconnect();

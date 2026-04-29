@@ -1,9 +1,8 @@
 // =====================
 // CLEAR DATABASE
 // =====================
-MATCH (n)
 CALL {
-WITH n
+MATCH (n)
 DETACH DELETE n
 } IN TRANSACTIONS OF 10000 ROWS;
 
@@ -122,27 +121,28 @@ MERGE (t)-[:HAS_STOPTIME]->(st)
 // =====================
 // NEXT CONNECTIONS
 // =====================
+CALL {
 MATCH (t:Trip)-[:HAS_STOPTIME]->(st:StopTime)
 WITH t, st
 ORDER BY t.id, st.sequence
 
 WITH t, collect(st) AS stops
-
 UNWIND range(0, size(stops)-2) AS i
 WITH stops[i] AS a, stops[i+1] AS b
 
-MERGE (a)-[:NEXT]->(b);
+MERGE (a)-[:NEXT]->(b)
+} IN TRANSACTIONS OF 1000 ROWS;
 
 
 // =====================
 // TRANSFERS (OPTYMALIZACJA)
 // =====================
-MATCH (a:Stop)
 CALL {
+MATCH (a:Stop)
 WITH a
 MATCH (b:Stop)
-WHERE distance(a.location, b.location) < 250
-AND a.id < b.id
-RETURN b
-}
-MERGE (a)-[:TRANSFER]->(b);
+WHERE a.id < b.id
+AND distance(a.location, b.location) < 250
+
+MERGE (a)-[:TRANSFER]->(b)
+} IN TRANSACTIONS OF 100 ROWS;

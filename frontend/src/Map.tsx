@@ -3,7 +3,7 @@ import map from "./assets/schemat_tram.svg";
 
 function Map() {
     return (
-        <div style={{ width: "100%", height: "100%", background: "#dce9dc", overflow: "hidden" }}>
+        <div style={{ width: "100%", height: "100%", background: "#ffffff", overflow: "hidden" }}>
             <TransformWrapper
                 initialScale={1}
                 minScale={0.4}
